@@ -1,79 +1,1 @@
-import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';
-import { idParamSchema } from '../../utils/reusedSchemas';
-import {
-  createUserBodySchema,
-  changeUserBodySchema,
-  subscribeBodySchema,
-} from './schemas';
-import type { UserEntity } from '../../utils/DB/entities/DBUsers';
-
-const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
-  fastify
-): Promise<void> => {
-  fastify.get('/', async function (request, reply): Promise<UserEntity[]> {});
-
-  fastify.get(
-    '/:id',
-    {
-      schema: {
-        params: idParamSchema,
-      },
-    },
-    async function (request, reply): Promise<UserEntity> {}
-  );
-
-  fastify.post(
-    '/',
-    {
-      schema: {
-        body: createUserBodySchema,
-      },
-    },
-    async function (request, reply): Promise<UserEntity> {}
-  );
-
-  fastify.delete(
-    '/:id',
-    {
-      schema: {
-        params: idParamSchema,
-      },
-    },
-    async function (request, reply): Promise<UserEntity> {}
-  );
-
-  fastify.post(
-    '/:id/subscribeTo',
-    {
-      schema: {
-        body: subscribeBodySchema,
-        params: idParamSchema,
-      },
-    },
-    async function (request, reply): Promise<UserEntity> {}
-  );
-
-  fastify.post(
-    '/:id/unsubscribeFrom',
-    {
-      schema: {
-        body: subscribeBodySchema,
-        params: idParamSchema,
-      },
-    },
-    async function (request, reply): Promise<UserEntity> {}
-  );
-
-  fastify.patch(
-    '/:id',
-    {
-      schema: {
-        body: changeUserBodySchema,
-        params: idParamSchema,
-      },
-    },
-    async function (request, reply): Promise<UserEntity> {}
-  );
-};
-
-export default plugin;
+import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-schema-to-ts';import { HttpError } from "@fastify/sensible/lib/httpError";import { validate } from "uuid";import { idParamSchema } from '../../utils/reusedSchemas';import {  createUserBodySchema,  changeUserBodySchema,  subscribeBodySchema,} from './schemas';import type { UserEntity } from '../../utils/DB/entities/DBUsers';import { validatePatchBody } from "../../utils/validators";const plugin: FastifyPluginAsyncJsonSchemaToTs = async (  fastify): Promise<void> => {  fastify.get('/', async function (): Promise<UserEntity[]> {    return await fastify.db.users.findMany();  });  fastify.get(    '/:id',    {      schema: {        params: idParamSchema,      },    },    async function (request): Promise<UserEntity | HttpError> {      const user = await fastify.db.users.findOne({ key: "id", equals: request.params.id });      return user ? user : fastify.httpErrors.notFound();    }  );  fastify.post(    '/',    {      schema: {        body: createUserBodySchema,      },    },    async function (request): Promise<UserEntity> {      return await fastify.db.users.create(request.body);    }  );  fastify.delete(    '/:id',    {      schema: {        params: idParamSchema,      },    },    async function (request): Promise<UserEntity | HttpError> {      if (!validate(request.params.id)) {        return fastify.httpErrors.badRequest();      }      const user = await fastify.db.users.findOne({ key: "id", equals: request.params.id });      if (user) {        const getUsers = fastify.db.users.findMany({ key: "subscribedToUserIds", inArray: request.params.id });        const getProfile = fastify.db.profiles.findOne({ key: "userId", equals: request.params.id });        const getPosts = fastify.db.posts.findMany({ key: "userId", equals: request.params.id });        const [users, profile, posts] = await Promise.all([getUsers, getProfile, getPosts]);        const deleteUserProfile = profile && fastify.db.profiles.delete(profile.id);        const updateSubscribers = users.map((subscribedUser) => {          const subscribedToUserIds = subscribedUser.subscribedToUserIds.filter((value: string) => value !== request.params.id);          return fastify.db.users.change(subscribedUser.id, { subscribedToUserIds });        });        const deletePosts = posts.map((post) => fastify.db.posts.delete(post.id));        const deleteUser = fastify.db.users.delete(request.params.id);        await Promise.all( [...updateSubscribers, ...deletePosts, deleteUserProfile, deleteUser]);      }      return fastify.httpErrors.notFound();    }  );  fastify.post(    '/:id/subscribeTo',    {      schema: {        body: subscribeBodySchema,        params: idParamSchema,      },    },    async function (request): Promise<UserEntity | HttpError> {      const user = await fastify.db.users.findOne({ key: "id", equals: request.body.userId });      if (user) {        user.subscribedToUserIds.push(request.params.id);        return await fastify.db.users.change(request.body.userId, user);      }      return fastify.httpErrors.notFound();    }  );  fastify.post(    '/:id/unsubscribeFrom',    {      schema: {        body: subscribeBodySchema,        params: idParamSchema,      },    },    async function (request): Promise<UserEntity | HttpError> {      const user = await fastify.db.users.findOne({ key: "id", equals: request.body.userId });      if (user) {        const subscribedToUserIds = user.subscribedToUserIds.filter((value) => value !== request.params.id);        if (subscribedToUserIds.length === user.subscribedToUserIds.length) {          return fastify.httpErrors.badRequest();        }        return await fastify.db.users.change(request.body.userId, { ...user, subscribedToUserIds });      }      return fastify.httpErrors.notFound();    }  );  fastify.patch(    '/:id',    {      schema: {        body: changeUserBodySchema,        params: idParamSchema,      },    },    async function (request): Promise<UserEntity | HttpError> {      if (!validatePatchBody(request.body, ['firstName', 'lastName', 'email'])) {        return fastify.httpErrors.badRequest();      }      const user = await fastify.db.users.findOne({ key: "id", equals: request.params.id });      if (user) {        return await fastify.db.users.change(request.params.id, request.body);      }      return fastify.httpErrors.notFound();    }  );};export default plugin;
