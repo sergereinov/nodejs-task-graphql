@@ -1,5 +1,6 @@
 import * as crypto from 'node:crypto';
 import DBEntity from './DBEntity';
+import posts from "../mockData/posts";
 
 export type PostEntity = {
   id: string;
@@ -15,6 +16,14 @@ export default class DBPosts extends DBEntity<
   ChangePostDTO,
   CreatePostDTO
 > {
+  constructor() {
+    super();
+
+    void this.entities.push(posts[0]);
+    void this.entities.push(posts[1]);
+    void this.entities.push(posts[2]);
+  }
+
   async create(dto: CreatePostDTO) {
     const created: PostEntity = {
       ...dto,

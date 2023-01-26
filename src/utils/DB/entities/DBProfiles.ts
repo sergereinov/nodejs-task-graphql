@@ -1,5 +1,6 @@
 import * as crypto from 'node:crypto';
 import DBEntity from './DBEntity';
+import profiles from "../mockData/profiles";
 
 export type ProfileEntity = {
   id: string;
@@ -20,6 +21,13 @@ export default class DBProfiles extends DBEntity<
   ChangeProfileDTO,
   CreateProfileDTO
 > {
+  constructor() {
+    super();
+
+    void this.entities.push(profiles[0]);
+    void this.entities.push(profiles[1]);
+  }
+
   async create(dto: CreateProfileDTO) {
     const created: ProfileEntity = {
       ...dto,
