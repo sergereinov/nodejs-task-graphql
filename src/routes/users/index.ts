@@ -6,6 +6,7 @@ import {
   subscribeBodySchema,
 } from './schemas';
 import type { UserEntity } from '../../utils/DB/entities/DBUsers';
+import DB from '../../utils/DB/DB';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -48,9 +49,43 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      return fastify.db.users
-        .delete(request.params.id)
-        .catch(() => { throw reply.badRequest() });
+      try {
+        //delete following
+        const deleteFollowingById = async (db: DB, followerId: string) => {
+          const following = await db.users.findMany({ key: 'subscribedToUserIds', inArray: followerId });
+          following.forEach((e) => {
+            const idx = e.subscribedToUserIds.findIndex((id) => id === followerId);
+            if (idx >= 0) e.subscribedToUserIds.splice(idx, 1);
+            db.users.change(e.id, e);
+          });
+        }
+
+        await deleteFollowingById(fastify.db, request.params.id);
+
+        //delete posts
+        const deletePostsByUserId = async (db: DB, userId: string) => {
+          const posts = await db.posts.findMany({ key: 'userId', equals: userId });
+          posts.forEach((e) => {
+            db.posts.delete(e.id);
+          })
+        };
+
+        await deletePostsByUserId(fastify.db, request.params.id);
+
+        //delete profile
+        const deleteProfileByUserId = async (db: DB, userId: string) => {
+          const profiles = await db.profiles.findMany({ key: 'userId', equals: userId });
+          profiles.forEach((e) => {
+            db.profiles.delete(e.id);
+          })
+        }
+
+        await deleteProfileByUserId(fastify.db, request.params.id);
+
+        return await fastify.db.users.delete(request.params.id);
+      } catch (e) {
+        throw reply.badRequest();
+      }
     }
   );
 
@@ -63,7 +98,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      throw reply.notImplemented();
+      const user = await fastify.db.users.findOne({ key: 'id', equals: request.body.userId });
+      if (!user) throw reply.badRequest();
+      const idx = user.subscribedToUserIds.findIndex((id) => id === request.params.id);
+      if (idx < 0) user.subscribedToUserIds.push(request.params.id);
+      return fastify.db.users.change(request.body.userId, user);
     }
   );
 
@@ -76,7 +115,12 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      throw reply.notImplemented();
+      const user = await fastify.db.users.findOne({ key: 'id', equals: request.body.userId });
+      if (!user) throw reply.badRequest();
+      const idx = user.subscribedToUserIds.findIndex((id) => id === request.params.id);
+      if (idx < 0) throw reply.badRequest();
+      user.subscribedToUserIds.splice(idx, 1);
+      return fastify.db.users.change(request.body.userId, user);
     }
   );
 
