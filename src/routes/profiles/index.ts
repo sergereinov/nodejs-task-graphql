@@ -32,6 +32,12 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity> {
+      const profile = await fastify.db.profiles.findOne({ key: 'userId', equals: request.body.userId });
+      if (profile) throw reply.badRequest();
+
+      const mt = await fastify.db.memberTypes.findOne({ key: 'id', equals: request.body.memberTypeId });
+      if (!mt) throw reply.badRequest();
+
       return fastify.db.profiles.create(request.body);
     }
   );
