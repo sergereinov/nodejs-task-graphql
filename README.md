@@ -1,15 +1,23 @@
-##For testing you can use [mock data](./src/utils/DB/mockData)
+<code style="color: green">You can use COPY functionality in web view of readme</code>
 
+##Run app:
+
+``npm run start``
+
+## 1. Add logic to the restful endpoints (users, posts, profiles, member-types folders in ./src/routes).
+
+``npm run test`` <code style="color: green">100%</code>
+
+---
+## 2. Add logic to the graphql endpoint (graphql folder in ./src/routes).
+
+For testing you can use [mock data](./src/utils/DB/mockData).
 You just need uncomment all comments at following files:
 [here](./src/utils/DB/entities/DBUsers.ts),
 [here](./src/utils/DB/entities/DBProfiles.ts) and
 [here](./src/utils/DB/entities/DBPosts.ts).
 
 <code style="color: orange">Be careful, uncomment only after checking 1 task. It affects tests because of changing initial state of DB</code>
-
-<code style="color: green">You can use COPY functionality in web view of readme</code>
-
----
 ## Query examples:
 ### 2.1 Get users, profiles, posts, memberTypes - 4 operations in one query.
 ```graphql
@@ -378,4 +386,36 @@ mutation($currentUser: ID, $userId: ID) {
 [link to types](./src/routes/graphql/types/inputTypes.ts)
 
 ---
-### 3. N+1:
+### 3. Solve n+1 graphql problem with dataloader package in all places where it should be used.
+[code here (line 0-0)](./src/..)
+
+
+---
+### 4. Limit the complexity of the graphql queries by their depth with graphql-depth-limit package.
+[code here (line 21-25)](./src/routes/graphql/index.ts)
+
+For current example: ``DEPTH_LIMIT_VALUE = 3;``
+
+You can check depth limit error with gql request:
+
+```graphql
+query {
+    users {
+        subscribedToUser {
+            subscribedToUser {
+                subscribedToUser {
+                    firstName
+                },
+            },
+        },
+    }
+}
+```
+
+Expected error:
+
+```json
+{
+"errors": "Error: exceeds maximum operation depth of 3"
+}
+```
