@@ -53,6 +53,17 @@ input UserInput {
   email: String
 }
 
+input ProfileInput {
+  avatar: String
+  sex: String
+  birthday: Int
+  country: String
+  street: String
+  city: String
+  memberTypeId: String
+  userId: ID!
+}
+
 input PostInput {
   title: String
   content: String
@@ -62,6 +73,7 @@ input PostInput {
 type Mutation {
   createStub(seed: String): [User]
   createUser(input: UserInput): User
+  createProfile(input: ProfileInput): Profile
   createPost(input: PostInput): Post
 }
 

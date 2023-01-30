@@ -1,6 +1,7 @@
 import { DBApi } from '../../../utils/DB/DBApi';
 import { CreateUserDTO } from '../../../utils/DB/entities/DBUsers';
 import { CreatePostDTO } from '../../../utils/DB/entities/DBPosts';
+import { CreateProfileDTO } from "../../../utils/DB/entities/DBProfiles";
 import * as stubResolver from './stub';
 import * as usersResolver from './users';
 import * as postsResolver from './posts';
@@ -20,6 +21,7 @@ export const rootResolver = {
 
     profiles: async ({ }, adb: DBApi) => profilesResolver.profiles(adb),
     profile: async ({ id }: { id: string }, adb: DBApi) => profilesResolver.profile(id, adb),
+    createProfile: async ({ input }: { input: CreateProfileDTO }, adb: DBApi) => profilesResolver.createProfile(input, adb),
 
     memberTypes: async ({ }, adb: DBApi) => memberTypesResolver.memberTypes(adb),
     memberType: async ({ id }: { id: string }, adb: DBApi) => memberTypesResolver.memberType(id, adb),

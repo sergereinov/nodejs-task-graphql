@@ -1,9 +1,8 @@
 import { GraphQLError } from 'graphql/error';
 import { DBApi } from "../../../utils/DB/DBApi";
-import { ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
+import { CreateProfileDTO, ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
 import * as usersResolver from './users';
 import * as memberTypesResolver from './member-types';
-
 
 /**
  * Profiles resolvers and wrappers
@@ -32,3 +31,6 @@ export const profileByUserId = async (userId: string, adb: DBApi) => {
     if (!result) return new GraphQLError('profile not found');
     return wrapProfile(result);
 }
+
+export const createProfile = async (dto: CreateProfileDTO, adb: DBApi) =>
+    wrapProfile(await adb.profiles.create(dto));
