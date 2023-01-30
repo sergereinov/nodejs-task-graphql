@@ -90,7 +90,6 @@ input MemberTypeUpdateInput {
   monthPostsLimit: Int
 }
 
-
 type Mutation {
   createStub(seed: String): [User]
   createUser(input: UserInput): User
