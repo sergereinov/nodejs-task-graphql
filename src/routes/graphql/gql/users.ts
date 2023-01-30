@@ -12,18 +12,20 @@ import * as memberTypesResolver from './member-types';
 /**
  * Wrap user object to match GraphQL schema `type User`
  */
-export const wrapUser = (user: UserEntity) => ({
-    ...user,
+export const wrapUser = (userEntity: UserEntity) => ({
+    ...userEntity,
 
     subscribedToUser: async ({ }, adb: DBApi) =>
-        user.subscribedToUserIds.map(async (userId) => await adb.users.getById(userId)),
+        userEntity.subscribedToUserIds.map(async (userId) =>
+            user(userId, adb) //user resolver from below
+        ),
 
     userSubscribedTo: async ({ }, adb: DBApi) =>
-        (await adb.users.getSubscribedTo(user.id)).map((e) => wrapUser(e)),
-        
-    posts: async ({ }, adb: DBApi) => postsResolver.postsByUserId(user.id, adb),
-    profile: async ({ }, adb: DBApi) => profilesResolver.profileByUserId(user.id, adb),
-    memberType: async ({ }, adb: DBApi) => memberTypesResolver.memberTypeByUserId(user.id, adb),
+        (await adb.users.getSubscribedTo(userEntity.id)).map((e) => wrapUser(e)),
+
+    posts: async ({ }, adb: DBApi) => postsResolver.postsByUserId(userEntity.id, adb),
+    profile: async ({ }, adb: DBApi) => profilesResolver.profileByUserId(userEntity.id, adb),
+    memberType: async ({ }, adb: DBApi) => memberTypesResolver.memberTypeByUserId(userEntity.id, adb),
 });
 
 export const users = async (adb: DBApi) =>
