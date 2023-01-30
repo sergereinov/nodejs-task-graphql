@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql/error';
 import { DBApi } from "../../../utils/DB/DBApi";
-import { MemberTypeEntity } from "../../../utils/DB/entities/DBMemberTypes";
+import { ChangeMemberTypeDTO, MemberTypeEntity } from "../../../utils/DB/entities/DBMemberTypes";
 
 /**
  * Member types resolvers and wrappers
@@ -28,3 +28,10 @@ export const memberTypeByUserId = async (userId: string, adb: DBApi) => {
     if (!mt) return new GraphQLError('member type not found');
     return wrapMemberType(mt);
 }
+
+export const updateMemberType = async (
+    memberTypeId: string,
+    dto: ChangeMemberTypeDTO,
+    adb: DBApi
+) =>
+    wrapMemberType(await adb.memberTypes.update(memberTypeId, dto));

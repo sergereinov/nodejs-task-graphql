@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql/error';
 import { DBApi } from '../../../utils/DB/DBApi';
-import { UserEntity, CreateUserDTO } from '../../../utils/DB/entities/DBUsers';
+import { UserEntity, CreateUserDTO, ChangeUserDTO } from '../../../utils/DB/entities/DBUsers';
 import * as postsResolver from './posts';
 import * as profilesResolver from './profiles';
 import * as memberTypesResolver from './member-types';
@@ -39,3 +39,6 @@ export const user = async (userId: string, adb: DBApi) => {
 
 export const createUser = async (dto: CreateUserDTO, adb: DBApi) =>
     wrapUser(await adb.users.create(dto));
+
+export const updateUser = async (userId: string, dto: ChangeUserDTO, adb: DBApi) =>
+    wrapUser(await adb.users.update(userId, dto));

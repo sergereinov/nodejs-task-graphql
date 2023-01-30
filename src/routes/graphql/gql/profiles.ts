@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql/error';
 import { DBApi } from "../../../utils/DB/DBApi";
-import { CreateProfileDTO, ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
+import { ChangeProfileDTO, CreateProfileDTO, ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
 import * as usersResolver from './users';
 import * as memberTypesResolver from './member-types';
 
@@ -13,7 +13,10 @@ import * as memberTypesResolver from './member-types';
  */
 export const wrapProfile = (profile: ProfileEntity) => ({
     ...profile,
-    memberType: async ({ }, adb: DBApi) => memberTypesResolver.memberType(profile.memberTypeId, adb),
+    
+    memberType: async ({ }, adb: DBApi) =>
+        memberTypesResolver.memberType(profile.memberTypeId, adb),
+
     user: async ({ }, adb: DBApi) => usersResolver.user(profile.userId, adb)
 });
 
@@ -34,3 +37,6 @@ export const profileByUserId = async (userId: string, adb: DBApi) => {
 
 export const createProfile = async (dto: CreateProfileDTO, adb: DBApi) =>
     wrapProfile(await adb.profiles.create(dto));
+
+export const updateProfile = async (profileId: string, dto: ChangeProfileDTO, adb: DBApi) =>
+    wrapProfile(await adb.profiles.update(profileId, dto));

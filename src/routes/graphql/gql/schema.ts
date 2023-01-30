@@ -64,17 +64,42 @@ input ProfileInput {
   userId: ID!
 }
 
+input ProfileUpdateInput {
+  avatar: String
+  sex: String
+  birthday: Int
+  country: String
+  street: String
+  city: String
+  memberTypeId: String
+}
+
 input PostInput {
   title: String
   content: String
   userId: String
 }
 
+input PostUpdateInput {
+  title: String
+  content: String
+}
+
+input MemberTypeUpdateInput {
+  discount: Int
+  monthPostsLimit: Int
+}
+
+
 type Mutation {
   createStub(seed: String): [User]
   createUser(input: UserInput): User
   createProfile(input: ProfileInput): Profile
   createPost(input: PostInput): Post
+  updateUser(userId: ID!, input: UserInput): User
+  updateProfile(profileId: ID!, input: ProfileUpdateInput): Profile
+  updatePost(postId: ID!, input: PostUpdateInput): Post
+  updateMemberType(memberTypeId: String, input: MemberTypeUpdateInput): MemberType
 }
 
 schema {

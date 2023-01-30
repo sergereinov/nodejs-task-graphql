@@ -8,7 +8,7 @@ export type PostEntity = {
   userId: string;
 };
 export type CreatePostDTO = Omit<PostEntity, 'id'>;
-type ChangePostDTO = Partial<Omit<PostEntity, 'id' | 'userId'>>;
+export type ChangePostDTO = Partial<Omit<PostEntity, 'id' | 'userId'>>;
 
 export default class DBPosts extends DBEntity<
   PostEntity,

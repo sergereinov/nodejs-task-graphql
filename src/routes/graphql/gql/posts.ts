@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql/error';
 import { DBApi } from '../../../utils/DB/DBApi';
-import { PostEntity, CreatePostDTO } from '../../../utils/DB/entities/DBPosts';
+import { PostEntity, CreatePostDTO, ChangePostDTO } from '../../../utils/DB/entities/DBPosts';
 import * as usersResolver from './users';
 
 /**
@@ -29,3 +29,6 @@ export const post = async (postId: string, adb: DBApi) => {
 
 export const createPost = async (dto: CreatePostDTO, adb: DBApi) =>
     wrapPost(await adb.posts.create(dto));
+
+export const updatePort = async (postId: string, dto: ChangePostDTO, adb: DBApi) =>
+    wrapPost(await adb.posts.update(postId, dto));
