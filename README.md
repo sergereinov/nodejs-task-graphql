@@ -2,7 +2,7 @@
 
 Educational project for rs.school (NodeJS)
 
-## Task #4
+## Task #5
 
 Implement Graphql backend.
 
