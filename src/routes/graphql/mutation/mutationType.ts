@@ -1,6 +1,5 @@
 import { GraphQLID, GraphQLObjectType } from "graphql";
 import { memberType, postType, profileType, userType } from "../types/common";
-import { FastifyInstance } from "fastify";
 import {
   memberTypeUpdateInputType,
   postCreateInputType, postUpdateInputType,
@@ -19,8 +18,8 @@ export default new GraphQLObjectType({
           type: userCreateInputType,
         },
       },
-      resolve: async (_, { payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: '/users', method: 'POST', payload });
+      resolve: async (_, { payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: '/users', method: 'POST', payload });
 
         return json();
       },
@@ -32,9 +31,8 @@ export default new GraphQLObjectType({
           type: profileCreateInputType,
         },
       } ,
-      //@todo: handle error if profile already exists
-      resolve: async (_, { payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: '/profiles', method: 'POST', payload });
+      resolve: async (_, { payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: '/profiles', method: 'POST', payload });
 
         return json();
       },
@@ -46,8 +44,8 @@ export default new GraphQLObjectType({
           type: postCreateInputType,
         },
       },
-      resolve: async (_, { payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: '/posts', method: 'POST', payload });
+      resolve: async (_, { payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: '/posts', method: 'POST', payload });
 
         return json();
       },
@@ -60,8 +58,8 @@ export default new GraphQLObjectType({
           type: userUpdateInputType,
         },
       },
-      resolve: async (_, { payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: `/users/${payload.id}`, method: 'PATCH', payload });
+      resolve: async (_, { payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: `/users/${payload.id}`, method: 'PATCH', payload });
 
         return json();
       },
@@ -73,8 +71,8 @@ export default new GraphQLObjectType({
           type: profileUpdateInputType,
         },
       },
-      resolve: async (_, { payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: `/profiles/${payload.id}`, method: 'PATCH', payload });
+      resolve: async (_, { payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: `/profiles/${payload.id}`, method: 'PATCH', payload });
 
         return json();
       },
@@ -86,8 +84,8 @@ export default new GraphQLObjectType({
           type: postUpdateInputType,
         },
       },
-      resolve: async (_, { payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: `/posts/${payload.id}`, method: 'PATCH', payload });
+      resolve: async (_, { payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: `/posts/${payload.id}`, method: 'PATCH', payload });
 
         return json();
       },
@@ -99,8 +97,8 @@ export default new GraphQLObjectType({
           type: memberTypeUpdateInputType,
         },
       },
-      resolve: async (_, { payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: `/member-types/${payload.id}`, method: 'PATCH', payload });
+      resolve: async (_, { payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: `/member-types/${payload.id}`, method: 'PATCH', payload });
 
         return json();
       },
@@ -112,8 +110,8 @@ export default new GraphQLObjectType({
         id: { type: GraphQLID },
         userId: { type: GraphQLID },
       },
-      resolve: async (_, { id, ...payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: `/users/${id}/subscribeTo`, method: 'POST', payload });
+      resolve: async (_, { id, ...payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: `/users/${id}/subscribeTo`, method: 'POST', payload });
 
         return json();
       },
@@ -124,8 +122,8 @@ export default new GraphQLObjectType({
         id: { type: GraphQLID },
         userId: { type: GraphQLID },
       },
-      resolve: async (_, { id, ...payload }, app: FastifyInstance) => {
-        const { json } = await app.inject({ url: `/users/${id}/unsubscribeFrom`, method: 'POST', payload });
+      resolve: async (_, { id, ...payload }, { fastify }) => {
+        const { json } = await fastify.inject({ url: `/users/${id}/unsubscribeFrom`, method: 'POST', payload });
 
         return json();
       },

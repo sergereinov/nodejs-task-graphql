@@ -27,7 +27,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (fastify): Promise<void> 
       return await graphql({
         schema,
         source,
-        contextValue: fastify,
+        contextValue: { fastify, dataLoaders: new Map() },
         variableValues: request.body.variables,
       });
     }

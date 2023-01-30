@@ -1,6 +1,6 @@
 import * as crypto from 'node:crypto';
 import DBEntity from './DBEntity';
-import users from "../mockData/users";
+// import users from "../mockData/users";
 
 export type UserEntity = {
   id: string;
@@ -20,9 +20,9 @@ export default class DBUsers extends DBEntity<
   constructor() {
     super();
 
-    void this.entities.push(users[0]);
-    void this.entities.push(users[1]);
-    void this.entities.push(users[2]);
+    // void this.entities.push(users[0]);
+    // void this.entities.push(users[1]);
+    // void this.entities.push(users[2]);
   }
 
   async create(dto: CreateUserDTO) {

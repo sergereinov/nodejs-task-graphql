@@ -387,8 +387,50 @@ mutation($currentUser: ID, $userId: ID) {
 
 ---
 ### 3. Solve n+1 graphql problem with dataloader package in all places where it should be used.
-[code here (line 0-0)](./src/..)
+[code here (line 30)](./src/routes/graphql/index.ts) and 
+[useDataLoader here (line 61-63)](./src/routes/graphql/types/userDataType.ts)
 
+Count and type of queries you can check using console
+(there are messages like `` DB request findMany of DBProfiles``)
+
+UseDataLoader was used to optimize DB queries. For example, send the following request:
+```graphql
+query {
+    users {
+        profile {
+            id
+        }
+    }
+}
+```
+
+You can see only 2 db requests:
+
+``
+DB request findMany of DBUsers
+``
+
+``
+DB request findMany of DBProfiles
+``
+
+Without dataLoader:
+
+````ts
+    profile: {
+      type: profileType,
+      resolve: async ({ id }, _, { fastify }) =>
+        await fastify.db.profiles.findOne({ key: "userId", equals: id }),
+    }
+````
+
+``
+DB request findMany of DBUsers
+``
+
+``
+DB request findOne of DBProfiles
+`` x 3 (depends on count of users)
 
 ---
 ### 4. Limit the complexity of the graphql queries by their depth with graphql-depth-limit package.
