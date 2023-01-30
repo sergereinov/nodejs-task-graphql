@@ -5,11 +5,21 @@ type User {
   lastName: String
   email: String
   subscribedToUser: [User]
-} 
+  posts: [Post]
+}
+
+type Post {
+  id: ID!
+  title: String
+  content: String
+  user: User!
+}
 
 type Query {
   users: [User]
   user(id: ID!): User
+  posts: [Post]
+  post(id: ID!): Post
 }
 
 input UserInput {
@@ -18,8 +28,15 @@ input UserInput {
   email: String
 }
 
+input PostInput {
+  title: String
+  content: String
+  userId: String
+}
+
 type Mutation {
   createUser(input: UserInput): User
+  createPost(input: PostInput): Post
 }
 
 schema {
