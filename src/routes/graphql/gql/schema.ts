@@ -5,7 +5,10 @@ type User {
   lastName: String
   email: String
   subscribedToUser: [User]
+  userSubscribedTo: [User]
   posts: [Post]
+  profile: Profile
+  memberType: MemberType  
 }
 
 type Post {
@@ -15,11 +18,33 @@ type Post {
   user: User!
 }
 
+type Profile {
+  id: ID!
+  avatar: String
+  sex: String
+  birthday: Int
+  country: String
+  street: String
+  city: String
+  memberType: MemberType
+  user: User
+}
+
+type MemberType {
+  id: String
+  discount: Int
+  monthPostsLimit: Int
+}
+
 type Query {
   users: [User]
   user(id: ID!): User
   posts: [Post]
   post(id: ID!): Post
+  profiles: [Profile]
+  profile(id: ID!): Profile
+  memberTypes: [MemberType]
+  memberType(id: String): MemberType
 }
 
 input UserInput {
@@ -35,6 +60,7 @@ input PostInput {
 }
 
 type Mutation {
+  createStub(seed: String): [User]
   createUser(input: UserInput): User
   createPost(input: PostInput): Post
 }
