@@ -100,6 +100,8 @@ type Mutation {
   updateProfile(profileId: ID!, input: ProfileUpdateInput): Profile
   updatePost(postId: ID!, input: PostUpdateInput): Post
   updateMemberType(memberTypeId: String, input: MemberTypeUpdateInput): MemberType
+  subscribeTo(userId: ID!, subscribesToUserId: ID!): User
+  unsubscribeFrom(userId: ID!, unsubscribesFromUserId: ID!): User
 }
 
 schema {

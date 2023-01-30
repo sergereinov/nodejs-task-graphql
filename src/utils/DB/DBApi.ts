@@ -19,12 +19,32 @@ export class DBApi {
         update: async (userId: string, dto: ChangeUserDTO) =>
             this.db.users.change(userId, dto),
 
-        subscribeTo: async (userId: string, subscribesToUserId: string): Promise<UserEntity | null> => {
+        subscribeTo: async (
+            userId: string,
+            subscribesToUserId: string
+        ): Promise<UserEntity | null> => {
             const user = await this.db.users.findOne({ key: 'id', equals: subscribesToUserId });
             if (!user) return null;
             const idx = user.subscribedToUserIds.findIndex((id) => id === userId);
-            if (idx < 0) user.subscribedToUserIds.push(userId);
-            return await this.db.users.change(subscribesToUserId, user);
+            if (idx < 0) {
+                user.subscribedToUserIds.push(userId);
+                await this.db.users.change(subscribesToUserId, user);
+            }
+            return this.users.getById(userId);
+        },
+
+        unsubscribeFrom: async (
+            userId: string,
+            unsubscribesFromUserId: string
+        ): Promise<UserEntity | null> => {
+            const user = await this.db.users.findOne({ key: 'id', equals: unsubscribesFromUserId });
+            if (!user) return null;
+            const idx = user.subscribedToUserIds.findIndex((id) => id === userId);
+            if (idx >= 0) {
+                user.subscribedToUserIds.splice(idx, 1);
+                this.db.users.change(unsubscribesFromUserId, user);
+            }
+            return this.users.getById(userId);
         },
     }
 

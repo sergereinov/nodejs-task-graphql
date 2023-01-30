@@ -24,7 +24,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     async function (request, reply) {
       const query: string = request.body.query || '';
       
-      const err = validate(schema, parse(query), [depthLimit(10)]);
+      const err = validate(schema, parse(query), [depthLimit(4)]);
       if (err.length > 0) return err;
 
       return await graphql({

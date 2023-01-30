@@ -22,6 +22,14 @@ export const rootResolver = {
         { userId, input }: { userId: string, input: ChangeUserDTO },
         adb: DBApi
     ) => usersResolver.updateUser(userId, input, adb),
+    subscribeTo: async (
+        { userId, subscribesToUserId }: { userId: string, subscribesToUserId: string },
+        adb: DBApi
+    ) => usersResolver.subscribeTo(userId, subscribesToUserId, adb),
+    unsubscribeFrom: async (
+        { userId, unsubscribesFromUserId }: { userId: string, unsubscribesFromUserId: string },
+        adb: DBApi
+    ) => usersResolver.unsubscribeFrom(userId, unsubscribesFromUserId, adb),
 
     // Posts resolvers
     posts: async ({ }, adb: DBApi) => postsResolver.posts(adb),

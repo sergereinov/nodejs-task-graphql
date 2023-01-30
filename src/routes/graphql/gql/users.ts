@@ -42,3 +42,23 @@ export const createUser = async (dto: CreateUserDTO, adb: DBApi) =>
 
 export const updateUser = async (userId: string, dto: ChangeUserDTO, adb: DBApi) =>
     wrapUser(await adb.users.update(userId, dto));
+
+export const subscribeTo = async (
+    userId: string,
+    subscribesToUserId: string,
+    adb: DBApi
+) => {
+    const u = await adb.users.subscribeTo(userId, subscribesToUserId);
+    if (!u) return new GraphQLError('subscribed user not found');
+    return wrapUser(u);
+}
+
+export const unsubscribeFrom = async (
+    userId: string,
+    unsubscribesFromUserId: string,
+    adb: DBApi
+) => {
+    const u = await adb.users.unsubscribeFrom(userId, unsubscribesFromUserId);
+    if (!u) return new GraphQLError('subscribed user not found');
+    return wrapUser(u);
+};
